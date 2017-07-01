@@ -1,20 +1,20 @@
 package paiza;
 
-import mockit.Deencapsulation;
 import mockit.Mocked;
 import mockit.NonStrictExpectations;
-import mockit.Verifications;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.StringWriter;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Queue;
 
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author yama-gen
@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 public class SkillCheckTest {
 
     @Test
-    public void testMain(@Mocked final BufferedReader br, @Mocked final PrintStream ps) throws Exception {
+    public void testMain(@Mocked final BufferedReader br) throws Exception {
 
         // 標準入力
         new NonStrictExpectations() {{
@@ -31,12 +31,16 @@ public class SkillCheckTest {
             result = "a,b";
         }};
 
+        // 標準出力の差し替え
+        final OutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+
         // 実行
         SkillCheck.main();
 
-        // 標準出力
-        new Verifications() {{
-            ps.println("hello = a , world = b");
-        }};
+        // キューに詰めて1行ずつアサート
+        final Queue<String> queue = new ArrayDeque<>(Arrays.asList(out.toString().split(System.lineSeparator())));
+        assertThat(queue.poll(), is("hello = a , world = b"));
+        assertThat(queue.poll(), is(nullValue()));
     }
 }
