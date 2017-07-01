@@ -19,7 +19,7 @@ import static org.junit.Assert.assertThat;
 /**
  * @author yama-gen
  */
-public class SkillCheckTest {
+public class MainTest {
 
     @Test
     public void testMain(@Mocked final BufferedReader br) throws Exception {
@@ -27,8 +27,7 @@ public class SkillCheckTest {
         // 標準入力
         new NonStrictExpectations() {{
             br.readLine();
-            result = "1";
-            result = "a,b";
+            result = "30 20";
         }};
 
         // 標準出力の差し替え
@@ -36,11 +35,11 @@ public class SkillCheckTest {
         System.setOut(new PrintStream(out));
 
         // 実行
-        SkillCheck.main();
+        Main.main();
 
         // キューに詰めて1行ずつアサート
         final Queue<String> queue = new ArrayDeque<>(Arrays.asList(out.toString().split(System.lineSeparator())));
-        assertThat(queue.poll(), is("hello = a , world = b"));
+        assertThat(queue.poll(), is("10"));
         assertThat(queue.poll(), is(nullValue()));
     }
 }
